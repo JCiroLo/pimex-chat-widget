@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const chatURL = 'http://localhost:4000/'
+const chatURL = 'https://pimex-chat-api.herokuapp.com/'
 const auth = {
   username: '14557',
   password: '2ofzTRwdkLjKZPr3nx4gXeh6H'
