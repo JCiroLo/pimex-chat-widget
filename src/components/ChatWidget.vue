@@ -66,9 +66,11 @@
                     {{ message.message }}
                   </div>
                   <div class="message_text" v-else>
-                    Por el momento no hay asesores disponibles para resolver tus
-                    dudas, dejanos tu correo para contactarnos contigo lo mas
-                    pronto posible
+                    <span v-if="formTab < 3"> 
+                      Por el momento no hay asesores disponibles para resolver tus
+                      dudas, dejanos tu correo para contactarnos contigo lo mas
+                      pronto posible
+                    </span>
                     <div class="bot_msg_form">
                       <small v-if="formTab < 3">({{ formTab + 1 }}/3)</small>
                       <transition name="fade-form-tabs" mode="out-in">
@@ -591,11 +593,11 @@ $widget_pos: 20px;
                 }
                 .bot_msg_form {
                   position: relative;
-                  margin-top: 15px;
                   display: flex;
                   flex-direction: column;
                   overflow-x: hidden;
                   small {
+                    margin-top: 15px;
                     text-align: end;
                     padding: 5px;
                     color: #bbb;
@@ -759,12 +761,12 @@ $widget_pos: 20px;
 
 .fade-form-tabs-enter{
   opacity: 0;
-  transform: translateX(-50px);
+  transform: translateX(50px);
 }
 
 .fade-form-tabs-leave-to {
   opacity: 0;
-  transform: translateX(50px);
+  transform: translateX(-50px);
 }
 
 .fade-form-tabs-enter-active,
