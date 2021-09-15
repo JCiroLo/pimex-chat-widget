@@ -119,9 +119,6 @@
                         </form>
                         <div class="form-control" v-if="formTab === 3" key="3">
                           <b>Gracias, ¡Nos pondremos en contacto!</b>
-                          {{ chatUserInfo.email }}
-                          {{ chatUserInfo.name }}
-                          {{ chatUserInfo.tel }}
                         </div>
                       </transition>
                     </div>
