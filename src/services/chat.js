@@ -9,7 +9,8 @@ const auth = {
 const addChat = async chatData => {
   try {
     const { data } = await axios.post(`${chatURL}chat`, chatData, {
-      auth: auth
+      auth: auth,
+      headers: { 'Access-Control-Allow-Origin': '*' }
     })
     return data
   } catch (e) {
@@ -20,7 +21,8 @@ const addChat = async chatData => {
 const addMessage = async MessageData => {
   try {
     const { data } = await axios.post(`${chatURL}message`, MessageData, {
-      auth: auth
+      auth: auth,
+      headers: { 'Access-Control-Allow-Origin': '*' }
     })
     return data
   } catch (e) {

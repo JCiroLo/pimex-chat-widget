@@ -70,10 +70,60 @@
                     dudas, dejanos tu correo para contactarnos contigo lo mas
                     pronto posible
                     <div class="bot_msg_form">
-                      <input type="text" placeholder="Correo electronico" />
-                      <button>
-                        <i class="fas fa-paper-plane"></i>
-                      </button>
+                      <small v-if="formTab < 3">({{ formTab + 1 }}/3)</small>
+                      <transition name="fade-form-tabs" mode="out-in">
+                        <form
+                          @submit.prevent="formNextTab(0)"
+                          class="form-control"
+                          v-if="formTab === 0"
+                          key="0"
+                        >
+                          <input
+                            type="text"
+                            v-model="chatUserInfo.email"
+                            placeholder="Correo electronico"
+                          />
+                          <button>
+                            <i class="fas fa-paper-plane"></i>
+                          </button>
+                        </form>
+                        <form
+                          @submit.prevent="formNextTab(1)"
+                          class="form-control"
+                          v-if="formTab === 1"
+                          key="1"
+                        >
+                          <input
+                            type="text"
+                            v-model="chatUserInfo.name"
+                            placeholder="Tu nombre"
+                          />
+                          <button>
+                            <i class="fas fa-paper-plane"></i>
+                          </button>
+                        </form>
+                        <form
+                          @submit.prevent="formNextTab(2)"
+                          class="form-control"
+                          v-if="formTab === 2"
+                          key="2"
+                        >
+                          <input
+                            type="text"
+                            v-model="chatUserInfo.tel"
+                            placeholder="Tu teléfono"
+                          />
+                          <button>
+                            <i class="fas fa-paper-plane"></i>
+                          </button>
+                        </form>
+                        <div class="form-control" v-if="formTab === 3" key="3">
+                          <b>Gracias, ¡Nos pondremos en contacto!</b>
+                          {{ chatUserInfo.email }}
+                          {{ chatUserInfo.name }}
+                          {{ chatUserInfo.tel }}
+                        </div>
+                      </transition>
                     </div>
                   </div>
                   <span class="time_date">
@@ -128,10 +178,12 @@ export default {
   data() {
     return {
       chatData: { id: "", userId: "", agentName: "", agentImg: "", name: "" },
+      chatUserInfo: { email: "", name: "", tel: "" },
       chatModal: false,
       message: null,
       messages: [],
       currentTab: 0,
+      formTab: 0,
     };
   },
   filters: {
@@ -215,6 +267,9 @@ export default {
     scrollToBottom() {
       const box = this.$refs.chatRef;
       box.scrollTop = box.scrollHeight;
+    },
+    formNextTab(currentFormTab) {
+      this.formTab = currentFormTab + 1;
     },
   },
   async beforeMount() {
@@ -539,37 +594,44 @@ $widget_pos: 20px;
                 }
                 .bot_msg_form {
                   position: relative;
-                  margin-top: 30px;
+                  margin-top: 15px;
                   display: flex;
-                  input {
-                    height: 30px;
-                    width: 100%;
-                    padding: 5px 10px;
-                    border: none;
-                    outline: none;
-                    border-radius: 5px;
+                  flex-direction: column;
+                  overflow-x: hidden;
+                  small {
+                    text-align: end;
+                    padding: 5px;
+                    color: #bbb;
                   }
-                  button {
-                    position: absolute;
+                  .form-control {
                     display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    width: 30px;
-                    height: 30px;
-                    right: 5px;
-                    top: 50%;
-                    border-radius: 5px;
-                    background-color: #146478;
-                    color: white;
-                    padding: 0;
-                    margin: 0;
-                    border: none;
-                    outline: none;
-                    cursor: pointer;
-                    transform: translateY(-50%);
-                    .svg {
-                      .path {
-                      }
+                    width: 100%;
+                    input {
+                      height: 30px;
+                      width: 100%;
+                      padding: 5px 10px;
+                      border: none;
+                      outline: none;
+                      border-radius: 5px;
+                    }
+                    button {
+                      position: absolute;
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      width: 30px;
+                      height: 30px;
+                      right: 5px;
+                      bottom: 5px;
+                      border-radius: 5px;
+                      color: #146478;
+                      background-color: transparent;
+                      padding: 0;
+                      margin: 0;
+                      border: none;
+                      outline: none;
+                      cursor: pointer;
+                      font-size: 18px;
                     }
                   }
                 }
@@ -696,5 +758,26 @@ $widget_pos: 20px;
 .fade-footer-enter-to,
 .fade-footer-leave {
   opacity: 1;
+}
+
+.fade-form-tabs-enter{
+  opacity: 0;
+  transform: translateX(-50px);
+}
+
+.fade-form-tabs-leave-to {
+  opacity: 0;
+  transform: translateX(50px);
+}
+
+.fade-form-tabs-enter-active,
+.fade-form-tabs-leave-active {
+  transition: all 0.2s ease-out;
+}
+
+.fade-form-tabs-enter-to,
+.fade-form-tabs-leave {
+  opacity: 1;
+  transform: translateX(0);
 }
 </style>
