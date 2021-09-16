@@ -74,7 +74,9 @@
                     <div class="bot_msg_form">
                       <small v-if="formTab < 3">
                         <button
-                          :style="{ visibility: formTab > 0 ? 'visible' : 'hidden' }"
+                          :style="{
+                            visibility: formTab > 0 ? 'visible' : 'hidden',
+                          }"
                           @click="formPrevTab()"
                         >
                           Atrás
@@ -197,6 +199,7 @@ export default {
       messages: [],
       currentTab: 0,
       formTab: 0,
+      boardData: {},
     };
   },
   filters: {
@@ -249,7 +252,7 @@ export default {
         return;
       }
       const info = {
-        boardId: "14557",
+        boardId: this.boardData.id,
         msg: this.message,
         message: this.message,
         chatId: this.chatData.id,
@@ -260,7 +263,7 @@ export default {
       this.messages.push(info);
       this.message = null;
       try {
-        await addMessage(info);
+        await addMessage(this.boardData, info);
       } catch (e) {
         this.message = info.message;
       }
@@ -268,7 +271,7 @@ export default {
         this.scrollToBottom();
       }, 50);
       // TODO la notificacion
-      // sendNotification('14557', msg)
+      // sendNotification(this.boardData.id, msg)
     },
     openAndCloseChat() {
       this.currentTab = 0;
@@ -290,13 +293,13 @@ export default {
         name: this.chatUserInfo.name,
         phone: this.chatUserInfo.tel,
         email: this.chatUserInfo.email,
-        project: "14557",
+        project: this.boardData.id,
         referrer: "Chat",
         origin: "Chat",
         _compare: false,
       };
       const { data } = await addLead(leadData);
-      await updateChat(this.chatData.id, {
+      await updateChat(this.boardData, this.chatData.id, {
         leadId: data.ID,
         name: this.chatUserInfo.name,
         submitedForm: true,
@@ -308,6 +311,10 @@ export default {
     await this.fetchMessages(this.$route.params.chatId);
     this.chatData.userId = this.$route.params.userId;
     this.chatData.id = this.$route.params.chatId;
+    this.boardData = {
+      id: this.$route.params.boardId,
+      token: this.$route.params.boardToken,
+    };
     if (this.chatData.submitedForm) {
       this.formTab = 3;
     }
@@ -321,10 +328,15 @@ $widget_y_gap: 20px;
 $widget_height_footer: 66px;
 $widget_height_header: 200px;
 $widget_height_header_active: 75px;
-$widget_height_body: calc(80vh - #{$widget_height_header} - #{$widget_height_footer} - #{$widget_y_gap * 2});
-$widget_height_body_active: calc(100vh - #{$widget_height_header_active} - #{$widget_height_footer} - #{$widget_y_gap * 2});
+$widget_height_body: calc(
+  80vh - #{$widget_height_header} - #{$widget_height_footer} - #{$widget_y_gap *
+    2}
+);
+$widget_height_body_active: calc(
+  100vh - #{$widget_height_header_active} - #{$widget_height_footer} - #{$widget_y_gap *
+    2}
+);
 $widget_width: 100vw;
-
 
 .chat-container {
   position: fixed;

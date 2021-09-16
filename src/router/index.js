@@ -11,7 +11,7 @@ const routes = [
       import(/* webpackChunkName: "greeting" */ '@/components/Greeting.vue')
   },
   {
-    path: '/:userId/:chatId',
+    path: '/:userId/:chatId/:boardId/:boardToken',
     name: 'chat',
     component: () =>
       import(/* webpackChunkName: "chat" */ '@/components/ChatWidget.vue')

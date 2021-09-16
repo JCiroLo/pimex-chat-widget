@@ -1,15 +1,14 @@
 import axios from 'axios'
 
-const chatURL = 'http://localhost:5000' // 'https://pimex-chat-api.herokuapp.com'
-const auth = {
-  username: '14557',
-  password: '2ofzTRwdkLjKZPr3nx4gXeh6H'
-}
+const chatURL = 'https://pimex-chat-api.herokuapp.com'
 
-const addChat = async chatData => {
+const addChat = async (boardData, chatData) => {
   try {
     const { data } = await axios.post(`${chatURL}/chat`, chatData, {
-      auth: auth,
+      auth: {
+        username: boardData.id,
+        password: boardData.token
+      },
       headers: { 'Access-Control-Allow-Origin': '*' }
     })
     return data
@@ -18,10 +17,13 @@ const addChat = async chatData => {
   }
 }
 
-const updateChat = async (chatId, chatData) => {
+const updateChat = async (boardData, chatId, chatData) => {
   try {
     const { data } = await axios.put(`${chatURL}/chat/${chatId}`, chatData, {
-      auth: auth,
+      auth: {
+        username: boardData.id,
+        password: boardData.token
+      },
       headers: { 'Access-Control-Allow-Origin': '*' }
     })
     console.log(data)
@@ -31,10 +33,13 @@ const updateChat = async (chatId, chatData) => {
   }
 }
 
-const addMessage = async MessageData => {
+const addMessage = async (boardData, MessageData) => {
   try {
     const { data } = await axios.post(`${chatURL}/message`, MessageData, {
-      auth: auth,
+      auth: {
+        username: boardData.id,
+        password: boardData.token
+      },
       headers: { 'Access-Control-Allow-Origin': '*' }
     })
     return data
