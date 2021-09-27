@@ -1,15 +1,14 @@
 import axios from 'axios'
 
-const chatURL = 'https://pimex-chat-api.herokuapp.com/'
-const auth = {
-  username: '14557',
-  password: '2ofzTRwdkLjKZPr3nx4gXeh6H'
-}
+const chatURL = 'https://pimex-chat-api.herokuapp.com'
 
-const addChat = async chatData => {
+const addChat = async (boardData, chatData) => {
   try {
-    const { data } = await axios.post(`${chatURL}chat`, chatData, {
-      auth: auth,
+    const { data } = await axios.post(`${chatURL}/chat`, chatData, {
+      auth: {
+        username: boardData.id,
+        password: boardData.token
+      },
       headers: { 'Access-Control-Allow-Origin': '*' }
     })
     return data
@@ -18,10 +17,29 @@ const addChat = async chatData => {
   }
 }
 
-const addMessage = async MessageData => {
+const updateChat = async (boardData, chatId, chatData) => {
   try {
-    const { data } = await axios.post(`${chatURL}message`, MessageData, {
-      auth: auth,
+    const { data } = await axios.put(`${chatURL}/chat/${chatId}`, chatData, {
+      auth: {
+        username: boardData.id,
+        password: boardData.token
+      },
+      headers: { 'Access-Control-Allow-Origin': '*' }
+    })
+    console.log(data)
+    return data
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+const addMessage = async (boardData, MessageData) => {
+  try {
+    const { data } = await axios.post(`${chatURL}/message`, MessageData, {
+      auth: {
+        username: boardData.id,
+        password: boardData.token
+      },
       headers: { 'Access-Control-Allow-Origin': '*' }
     })
     return data
@@ -30,4 +48,4 @@ const addMessage = async MessageData => {
   }
 }
 
-export { addChat, addMessage }
+export { addChat, addMessage, updateChat }

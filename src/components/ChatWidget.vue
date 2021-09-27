@@ -34,7 +34,7 @@
           </div>
         </div>
       </div>
-      <div class="mesgs" ref="chatRef" :class="{ active: currentTab === 0 }">
+      <div class="mesgs" ref="chatRef" :class="{ active: currentTab === 1 }">
         <transition name="fade-tabs" mode="out-in">
           <div class="greeting" key="0" v-if="currentTab === 0">
             <div class="begin_conversation">
@@ -66,16 +66,26 @@
                     {{ message.message }}
                   </div>
                   <div class="message_text" v-else>
-                    <span v-if="formTab < 3"> 
-                      Por el momento no hay asesores disponibles para resolver tus
-                      dudas, dejanos tu correo para contactarnos contigo lo mas
-                      pronto posible
+                    <span v-if="formTab < 3">
+                      Por el momento no hay asesores disponibles para resolver
+                      tus dudas, dejanos tu correo para contactarnos contigo lo
+                      mas pronto posible
                     </span>
                     <div class="bot_msg_form">
-                      <small v-if="formTab < 3">({{ formTab + 1 }}/3)</small>
+                      <small v-if="formTab < 3">
+                        <button
+                          :style="{
+                            visibility: formTab > 0 ? 'visible' : 'hidden',
+                          }"
+                          @click="formPrevTab()"
+                        >
+                          Atrás
+                        </button>
+                        <span>({{ formTab + 1 }}/3)</span>
+                      </small>
                       <transition name="fade-form-tabs" mode="out-in">
                         <form
-                          @submit.prevent="formNextTab(0)"
+                          @submit.prevent="formNextTab()"
                           class="form-control"
                           v-if="formTab === 0"
                           key="0"
@@ -90,7 +100,7 @@
                           </button>
                         </form>
                         <form
-                          @submit.prevent="formNextTab(1)"
+                          @submit.prevent="formNextTab()"
                           class="form-control"
                           v-if="formTab === 1"
                           key="1"
@@ -105,7 +115,12 @@
                           </button>
                         </form>
                         <form
-                          @submit.prevent="formNextTab(2)"
+                          @submit.prevent="
+                            () => {
+                              formNextTab();
+                              submitChatForm();
+                            }
+                          "
                           class="form-control"
                           v-if="formTab === 2"
                           key="2"
@@ -170,7 +185,8 @@
 <script>
 import moment from "moment";
 // import {sendNotification} from "../lib/utils";
-import { addMessage } from "../services/chat";
+import { addMessage, updateChat } from "../services/chat";
+import { addLead } from "../services/pimex";
 
 export default {
   name: "ChatWidget",
@@ -183,6 +199,7 @@ export default {
       messages: [],
       currentTab: 0,
       formTab: 0,
+      boardData: {},
     };
   },
   filters: {
@@ -208,24 +225,17 @@ export default {
       }
       this.currentTab = tabNumber;
     },
-    async fetchName() {
-      const resBoardName = await window.db
+    async fetchName(chatId) {
+      const resChatData = await window.db
         .collection("chats")
-        .doc(this.chatData.id)
+        .doc(chatId)
         .get();
-      this.chatData.agentName = resBoardName.data().agentName;
-      this.chatData.agentImg = resBoardName.data().agentImg;
-
-      const resName = await window.db
-        .collection("chats")
-        .doc(this.chatData.id)
-        .get();
-      this.chatData.name = resName.data().name;
+      this.chatData = resChatData.data();
     },
-    fetchMessages() {
+    fetchMessages(chatId) {
       window.db
         .collection("messages")
-        .where("chatId", "==", this.chatData.id)
+        .where("chatId", "==", chatId)
         .orderBy("createdAt")
         .onSnapshot((querySnapshot) => {
           const allMessages = [];
@@ -242,7 +252,7 @@ export default {
         return;
       }
       const info = {
-        boardId: "14557",
+        boardId: this.boardData.id,
         msg: this.message,
         message: this.message,
         chatId: this.chatData.id,
@@ -251,13 +261,17 @@ export default {
         createdAt: new Date(),
       };
       this.messages.push(info);
-      await addMessage(info);
+      this.message = null;
+      try {
+        await addMessage(this.boardData, info);
+      } catch (e) {
+        this.message = info.message;
+      }
       setTimeout(() => {
         this.scrollToBottom();
       }, 50);
       // TODO la notificacion
-      // sendNotification('14557', msg)
-      this.message = null;
+      // sendNotification(this.boardData.id, msg)
     },
     openAndCloseChat() {
       this.currentTab = 0;
@@ -267,32 +281,68 @@ export default {
       const box = this.$refs.chatRef;
       box.scrollTop = box.scrollHeight;
     },
-    formNextTab(currentFormTab) {
-      this.formTab = currentFormTab + 1;
+    formPrevTab() {
+      this.formTab--;
+    },
+    formNextTab() {
+      this.formTab++;
+    },
+    async submitChatForm() {
+      const leadData = {
+        _state: "lead",
+        name: this.chatUserInfo.name,
+        phone: this.chatUserInfo.tel,
+        email: this.chatUserInfo.email,
+        project: this.boardData.id,
+        referrer: "Chat",
+        origin: "Chat",
+        _compare: false,
+      };
+      const { data } = await addLead(leadData);
+      await updateChat(this.boardData, this.chatData.id, {
+        leadId: data.ID,
+        name: this.chatUserInfo.name,
+        submitedForm: true,
+      });
     },
   },
   async beforeMount() {
+    await this.fetchName(this.$route.params.chatId);
+    await this.fetchMessages(this.$route.params.chatId);
     this.chatData.userId = this.$route.params.userId;
     this.chatData.id = this.$route.params.chatId;
-    await this.fetchName();
-    await this.fetchMessages();
+    this.boardData = {
+      id: this.$route.params.boardId,
+      token: this.$route.params.boardToken,
+    };
+    if (this.chatData.submitedForm) {
+      this.formTab = 3;
+    }
   },
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-$widget_height: 80vh;
-$widget_height_active: 100vh;
+$widget_x_gap: 20px;
+$widget_y_gap: 20px;
+$widget_height_footer: 66px;
+$widget_height_header: 200px;
+$widget_height_header_active: 75px;
+$widget_height_body: calc(
+  80vh - #{$widget_height_header} - #{$widget_height_footer} - #{$widget_y_gap *
+    2}
+);
+$widget_height_body_active: calc(
+  100vh - #{$widget_height_header_active} - #{$widget_height_footer} - #{$widget_y_gap *
+    2}
+);
 $widget_width: 100vw;
-$widget_b_pos: 2px; // Bottom position
-$widget_pos: 20px;
 
 .chat-container {
   position: fixed;
-  bottom: 100px;
-  left: $widget_pos;
-  right: $widget_pos;
+  bottom: $widget_y_gap;
+  left: $widget_x_gap;
+  right: $widget_x_gap;
   .inbox_msg {
     overflow: hidden;
     border-radius: 15px;
@@ -313,13 +363,13 @@ $widget_pos: 20px;
     .inbox_header {
       display: flex;
       width: 100%;
-      min-height: 200px;
-      max-height: 200px;
+      min-height: $widget_height_header;
+      max-height: $widget_height_header;
       background-image: linear-gradient(45deg, #134251, #146e78);
       transition: min-height 0.1s ease-out;
       &.active {
-        min-height: 75px;
-        max-height: 75px;
+        min-height: $widget_height_header_active;
+        max-height: $widget_height_header_active;
       }
       .greeting_text {
         display: flex;
@@ -423,16 +473,15 @@ $widget_pos: 20px;
     .mesgs {
       display: flex;
       flex: 0 0 100%;
-      max-height: 400px;
-      min-height: 400px;
+      max-height: $widget_height_body;
+      min-height: $widget_height_body;
       overflow-y: auto;
       overflow-x: hidden;
       scroll-behavior: smooth;
-      padding-bottom: 60px;
       transition: min-height 0.1s ease-out, padding 0.1s ease-out;
       &.active {
-        max-height: 200px;
-        min-height: 200px;
+        max-height: $widget_height_body_active;
+        min-height: $widget_height_body_active;
         padding: 0;
       }
       .greeting {
@@ -597,10 +646,20 @@ $widget_pos: 20px;
                   flex-direction: column;
                   overflow-x: hidden;
                   small {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
                     margin-top: 15px;
-                    text-align: end;
-                    padding: 5px;
+                    padding: 5px 5px 5px 0;
                     color: #bbb;
+
+                    button {
+                      color: #bbb;
+                      background-color: transparent;
+                      border: none;
+                      outline: none;
+                      cursor: pointer;
+                    }
                   }
                   .form-control {
                     display: flex;
@@ -669,7 +728,7 @@ $widget_pos: 20px;
       display: flex;
       justify-content: center;
       align-items: flex-end;
-      height: 66px;
+      height: $widget_height_footer;
       transition: box-shadow 0.2s ease-out;
       &.active {
         box-shadow: 0 0 15px #00000011;
@@ -759,7 +818,7 @@ $widget_pos: 20px;
   opacity: 1;
 }
 
-.fade-form-tabs-enter{
+.fade-form-tabs-enter {
   opacity: 0;
   transform: translateX(50px);
 }
