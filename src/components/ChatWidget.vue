@@ -3,7 +3,7 @@
     <div class="inbox_msg">
       <div class="inbox_header" :class="{ active: currentTab === 1 }">
         <div class="greeting_text" v-if="currentTab === 0">
-          <h4>Hola {{ chatData.name }}👋</h4>
+          <h4>Hola 👋</h4>
           <p>
             Pregúntanos lo que quieras y comparte con nosotros tus comentarios
           </p>
@@ -51,6 +51,13 @@
           </div>
           <div class="msgs_chat" key="1" v-if="currentTab === 1">
             <div class="msg_history">
+              <div class="we_use_pimex">
+                <img
+                  src="https://es.pimex.co/wp-content/uploads/2018/04/simbolo.png"
+                  alt="Pimex_logo"
+                />
+                <span>Usamos Pimex</span>
+              </div>
               <div
                 v-for="(message, index) in messages"
                 :key="index"
@@ -62,7 +69,11 @@
                 }"
               >
                 <div class="message_content">
-                  <div class="message_text" v-if="message.senderType !== 'bot'">
+                  <div
+                    class="message_text"
+                    :class="{ 'too-large': message.message.length > 20 }"
+                    v-if="message.senderType !== 'bot'"
+                  >
                     {{ message.message }}
                   </div>
                   <div class="message_text" v-else>
@@ -91,7 +102,7 @@
                           key="0"
                         >
                           <input
-                            type="text"
+                            type="email"
                             v-model="chatUserInfo.email"
                             placeholder="Correo electronico"
                           />
@@ -135,7 +146,7 @@
                           </button>
                         </form>
                         <div class="form-control" v-if="formTab === 3" key="3">
-                          <b>Gracias, ¡Nos pondremos en contacto!</b>
+                          Gracias, ¡Nos pondremos en contacto!
                         </div>
                       </transition>
                     </div>
@@ -144,13 +155,6 @@
                     {{ message.createdAt | formatChatDate }}
                   </span>
                 </div>
-              </div>
-              <div class="we_use_pimex" @click="fetchName">
-                <img
-                  src="https://es.pimex.co/wp-content/uploads/2018/04/simbolo.png"
-                  alt="Pimex_logo"
-                />
-                <span>Usamos Pimex</span>
               </div>
             </div>
           </div>
@@ -333,7 +337,7 @@ $widget_height_body: calc(
     2}
 );
 $widget_height_body_active: calc(
-  100vh - #{$widget_height_header_active} - #{$widget_height_footer} - #{$widget_y_gap *
+  90vh - #{$widget_height_header_active} - #{$widget_height_footer} - #{$widget_y_gap *
     2}
 );
 $widget_width: 100vw;
@@ -478,6 +482,7 @@ $widget_width: 100vw;
       overflow-y: auto;
       overflow-x: hidden;
       scroll-behavior: smooth;
+      margin-bottom: 30px;
       transition: min-height 0.1s ease-out, padding 0.1s ease-out;
       &.active {
         max-height: $widget_height_body_active;
@@ -529,10 +534,9 @@ $widget_width: 100vw;
         display: flex;
         flex: 0 0 100%;
         .msg_history {
-          width: 100%;
-          height: 100%;
           display: flex;
           flex-direction: column;
+          width: 100%;
           word-break: break-all;
           padding: 15px 15px 0 15px;
           background: #fff;
@@ -556,6 +560,9 @@ $widget_width: 100vw;
                 text-align: left;
                 word-wrap: break-word;
                 word-break: keep-all;
+                &.too-large {
+                  word-break: break-all;
+                }
               }
 
               .time_date {
@@ -701,18 +708,24 @@ $widget_width: 100vw;
             }
           }
           .we_use_pimex {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            bottom: 60px;
+            right: 0;
+            left: 0;
             height: 20px;
             width: fit-content;
             padding: 5px 15px;
             margin: 0 auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             border-radius: 15px;
-            transition: background-color 0.2s ease-out;
+            opacity: 0.5;
+            transition: background-color 0.2s ease-out, opacity 0.2s ease-out;
             &:hover {
               background-color: #eff4f8;
               cursor: pointer;
+              opacity: 1;
             }
             img {
               height: 100%;
@@ -764,7 +777,7 @@ $widget_width: 100vw;
         }
       }
       .we_use_pimex {
-        height: 30px;
+        height: 20px;
         width: fit-content;
         padding: 5px 15px;
         margin: auto 0;
