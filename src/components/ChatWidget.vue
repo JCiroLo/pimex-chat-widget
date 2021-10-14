@@ -13,9 +13,9 @@
             <span class="close_stripe_1"></span>
             <span class="close_stripe_2"></span>
           </button>
-          <img :src="chatData.agentImg" alt="" class="profile" />
+          <img :src="chatData.agentInfo.logo" alt="" class="profile" />
           <div class="user_info">
-            <h4>{{ chatData.agentName }}</h4>
+            <h4>{{ chatData.agentInfo.name }}</h4>
             <small>Integrante de Pimex</small>
           </div>
         </div>
