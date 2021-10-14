@@ -1,9 +1,8 @@
 import axios from 'axios'
+import config from '../../config.json'
 
-const baseUrl = 'https://api.pimex.co/v2'
-
-const token =
-  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExMiwiaWF0IjoxNTc0MTQ3MjA3fQ.YYdQd7sLHSbKLmRDVSqvAG3Y5VaaxXspUUzhfYKRLLg'
+const baseUrl = config.pimexApi.url
+const token = config.pimexApi.token
 
 const addLead = async Data => {
   try {
@@ -36,4 +35,4 @@ const addNotification = async (idUser, data) => {
   }
 }
 
-export { getUsersFromBoard, addNotification, addLead }
+export { addNotification, getUsersFromBoard, addLead }
