@@ -3,7 +3,7 @@
     <div class="inbox_msg">
       <div class="inbox_header" :class="{ active: currentTab === 1 }">
         <div class="greeting_text" v-if="currentTab === 0">
-          <h4>Hola {{ chatData.name }}👋</h4>
+          <h4>Hola {{ `${chatData.name.split(" ")[0]} ` }}👋</h4>
           <p>
             Pregúntanos lo que quieras y comparte con nosotros tus comentarios
           </p>
@@ -13,23 +13,9 @@
             <span class="close_stripe_1"></span>
             <span class="close_stripe_2"></span>
           </button>
-          <img
-            :src="chatData.agentImg"
-            alt=""
-            v-if="chatData.agentImg"
-            class="profile"
-          />
-          <div class="icon" v-else>
-            <svg viewBox="0 0 147.39 108.07">
-              <path
-                class="cls-1"
-                fill="white"
-                d="M130.43,9.91a40,40,0,0,0-18.31,9.35s0,0,0,0,0,0,0,0a2.76,2.76,0,0,0-.28.39,2.77,2.77,0,0,0-.31.45,2.17,2.17,0,0,0-.13.5,3.14,3.14,0,0,0-.12.51,3,3,0,0,0,.07.51,2.36,2.36,0,0,0,.09.52,3,3,0,0,0,.26.46,2.34,2.34,0,0,0,.26.43s0,0,0,0l0,.05a71.31,71.31,0,0,1,13.81,20.52l.12.27c.1.23.19.45.26.57a48.88,48.88,0,0,0,21.25,23.12,17.23,17.23,0,0,1-8.24,2.19A2.72,2.72,0,0,0,136.94,71a2.77,2.77,0,0,0-.38,2.46,19.42,19.42,0,0,0,6.58,8.48,55.63,55.63,0,0,0-13.39,4.58,45,45,0,0,0-6.41,4.37,74.89,74.89,0,0,1-49.65,17.17A74.89,74.89,0,0,1,24,90.88a45.58,45.58,0,0,0-6.41-4.37A55.63,55.63,0,0,0,4.24,81.93a19.4,19.4,0,0,0,6.57-8.48,2.72,2.72,0,0,0-2.59-3.59A17.16,17.16,0,0,1,0,67.66a48.66,48.66,0,0,0,21.19-23c.11-.22.21-.44.31-.67l.14-.32A71,71,0,0,1,35.43,23.19s0,0,0-.05,0,0,0,0a2.3,2.3,0,0,0,.25-.43,2.59,2.59,0,0,0,.26-.46,2.36,2.36,0,0,0,.09-.52,3,3,0,0,0,.07-.51,3.1,3.1,0,0,0-.11-.51,2.83,2.83,0,0,0-.13-.5,2.83,2.83,0,0,0-.32-.45,2.7,2.7,0,0,0-.27-.39l-.05,0,0,0A40,40,0,0,0,16.94,9.91a2.72,2.72,0,1,0-1.07,5.34A33.55,33.55,0,0,1,29.49,21.6,77.25,77.25,0,0,0,17.74,39.09C7.34,29.42,5.64,10.81,5.41,2.83a2.79,2.79,0,0,1,1-2.2A2.66,2.66,0,0,1,8.68.06,80.65,80.65,0,0,1,39.13,12.4a8.1,8.1,0,0,0,9,.19A47.49,47.49,0,0,1,73.69,4.4a47.48,47.48,0,0,1,25.54,8.19,8.08,8.08,0,0,0,9-.2A80.8,80.8,0,0,1,138.69.06,2.65,2.65,0,0,1,141,.63a2.77,2.77,0,0,1,1,2.19c-.22,8-1.92,26.6-12.32,36.27A77.29,77.29,0,0,0,117.88,21.6a33.53,33.53,0,0,1,13.63-6.35,2.71,2.71,0,0,0,2-1.8"
-              />
-            </svg>
-          </div>
+          <img :src="chatData.agentInfo.logo" alt="" class="profile" />
           <div class="user_info">
-            <h4>{{ chatData.agentName || "Agente de Pimex" }}</h4>
+            <h4>{{ chatData.agentInfo.name }}</h4>
             <small>Integrante de Pimex</small>
           </div>
         </div>
@@ -51,6 +37,13 @@
           </div>
           <div class="msgs_chat" key="1" v-if="currentTab === 1">
             <div class="msg_history">
+              <div class="we_use_pimex">
+                <img
+                  src="https://es.pimex.co/wp-content/uploads/2018/04/simbolo.png"
+                  alt="Pimex_logo"
+                />
+                <span>Usamos Pimex</span>
+              </div>
               <div
                 v-for="(message, index) in messages"
                 :key="index"
@@ -62,7 +55,11 @@
                 }"
               >
                 <div class="message_content">
-                  <div class="message_text" v-if="message.senderType !== 'bot'">
+                  <div
+                    class="message_text"
+                    :class="{ 'too-large': message.message.length > 20 }"
+                    v-if="message.senderType !== 'bot'"
+                  >
                     {{ message.message }}
                   </div>
                   <div class="message_text" v-else>
@@ -83,7 +80,10 @@
                         </button>
                         <span>({{ formTab + 1 }}/3)</span>
                       </small>
-                      <transition name="fade-form-tabs" mode="out-in">
+                      <transition
+                        :name="`form-tabs-to-${transitionState}`"
+                        mode="out-in"
+                      >
                         <form
                           @submit.prevent="formNextTab()"
                           class="form-control"
@@ -91,7 +91,7 @@
                           key="0"
                         >
                           <input
-                            type="text"
+                            type="email"
                             v-model="chatUserInfo.email"
                             placeholder="Correo electronico"
                           />
@@ -135,7 +135,7 @@
                           </button>
                         </form>
                         <div class="form-control" v-if="formTab === 3" key="3">
-                          <b>Gracias, ¡Nos pondremos en contacto!</b>
+                          Gracias, ¡Nos pondremos en contacto!
                         </div>
                       </transition>
                     </div>
@@ -144,13 +144,6 @@
                     {{ message.createdAt | formatChatDate }}
                   </span>
                 </div>
-              </div>
-              <div class="we_use_pimex" @click="fetchName">
-                <img
-                  src="https://es.pimex.co/wp-content/uploads/2018/04/simbolo.png"
-                  alt="Pimex_logo"
-                />
-                <span>Usamos Pimex</span>
               </div>
             </div>
           </div>
@@ -200,6 +193,7 @@ export default {
       currentTab: 0,
       formTab: 0,
       boardData: {},
+      transitionState: "right",
     };
   },
   filters: {
@@ -264,6 +258,7 @@ export default {
       this.message = null;
       try {
         await addMessage(this.boardData, info);
+        this.$track.event("chat.customer.send-message"); // Track
       } catch (e) {
         this.message = info.message;
       }
@@ -282,10 +277,13 @@ export default {
       box.scrollTop = box.scrollHeight;
     },
     formPrevTab() {
+      this.transitionState = "left";
       this.formTab--;
     },
     formNextTab() {
+      this.transitionState = "right";
       this.formTab++;
+      this.$track.event("chat.customer.fill-form", { step: this.formTab }); // Track
     },
     async submitChatForm() {
       const leadData = {
@@ -304,6 +302,7 @@ export default {
         name: this.chatUserInfo.name,
         submitedForm: true,
       });
+      this.$track.event("chat.customer.create-lead"); // Track
     },
   },
   async beforeMount() {
@@ -333,7 +332,7 @@ $widget_height_body: calc(
     2}
 );
 $widget_height_body_active: calc(
-  100vh - #{$widget_height_header_active} - #{$widget_height_footer} - #{$widget_y_gap *
+  90vh - #{$widget_height_header_active} - #{$widget_height_footer} - #{$widget_y_gap *
     2}
 );
 $widget_width: 100vw;
@@ -440,9 +439,10 @@ $widget_width: 100vw;
         }
         .profile {
           margin-left: 10px;
-          width: 45px;
-          height: 45px;
-          border-radius: 15px;
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          object-fit: cover;
         }
         .icon {
           display: flex;
@@ -478,6 +478,7 @@ $widget_width: 100vw;
       overflow-y: auto;
       overflow-x: hidden;
       scroll-behavior: smooth;
+      margin-bottom: 30px;
       transition: min-height 0.1s ease-out, padding 0.1s ease-out;
       &.active {
         max-height: $widget_height_body_active;
@@ -529,10 +530,9 @@ $widget_width: 100vw;
         display: flex;
         flex: 0 0 100%;
         .msg_history {
-          width: 100%;
-          height: 100%;
           display: flex;
           flex-direction: column;
+          width: 100%;
           word-break: break-all;
           padding: 15px 15px 0 15px;
           background: #fff;
@@ -556,6 +556,9 @@ $widget_width: 100vw;
                 text-align: left;
                 word-wrap: break-word;
                 word-break: keep-all;
+                &.too-large {
+                  word-break: break-all;
+                }
               }
 
               .time_date {
@@ -701,18 +704,25 @@ $widget_width: 100vw;
             }
           }
           .we_use_pimex {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            bottom: 60px;
+            right: 0;
+            left: 0;
             height: 20px;
             width: fit-content;
             padding: 5px 15px;
             margin: 0 auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             border-radius: 15px;
-            transition: background-color 0.2s ease-out;
+            opacity: 0.5;
+            font-size: 12px;
+            transition: background-color 0.2s ease-out, opacity 0.2s ease-out;
             &:hover {
               background-color: #eff4f8;
               cursor: pointer;
+              opacity: 1;
             }
             img {
               height: 100%;
@@ -764,7 +774,7 @@ $widget_width: 100vw;
         }
       }
       .we_use_pimex {
-        height: 30px;
+        height: 20px;
         width: fit-content;
         padding: 5px 15px;
         margin: auto 0;
@@ -772,10 +782,13 @@ $widget_width: 100vw;
         justify-content: center;
         align-items: center;
         border-radius: 15px;
-        transition: background-color 0.2s ease-out;
+        font-size: 12px;
+        opacity: 0.75;
+        transition: background-color 0.2s ease-out, opacity 0.2s ease-out;
         &:hover {
           background-color: #eff4f8;
           cursor: pointer;
+          opacity: 1;
         }
         img {
           height: 100%;
@@ -818,23 +831,46 @@ $widget_width: 100vw;
   opacity: 1;
 }
 
-.fade-form-tabs-enter {
+.form-tabs-to-right-enter {
   opacity: 0;
   transform: translateX(50px);
 }
 
-.fade-form-tabs-leave-to {
+.form-tabs-to-right-leave-to {
   opacity: 0;
   transform: translateX(-50px);
 }
 
-.fade-form-tabs-enter-active,
-.fade-form-tabs-leave-active {
+.form-tabs-to-right-enter-active,
+.form-tabs-to-right-leave-active {
   transition: all 0.2s ease-out;
 }
 
-.fade-form-tabs-enter-to,
-.fade-form-tabs-leave {
+.form-tabs-to-right-enter-to,
+.form-tabs-to-right-leave {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+//
+
+.form-tabs-to-left-enter {
+  opacity: 0;
+  transform: translateX(-50px);
+}
+
+.form-tabs-to-left-leave-to {
+  opacity: 0;
+  transform: translateX(50px);
+}
+
+.form-tabs-to-left-enter-active,
+.form-tabs-to-left-leave-active {
+  transition: all 0.2s ease-out;
+}
+
+.form-tabs-to-left-enter-to,
+.form-tabs-to-left-leave {
   opacity: 1;
   transform: translateX(0);
 }
