@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const chatURL = 'https://pimex-chat-api.herokuapp.com'
+const chatURL = 'http://localhost:5000' // 'https://pimex-chat-api.herokuapp.com'
 
 const addChat = async (boardData, chatData) => {
   try {

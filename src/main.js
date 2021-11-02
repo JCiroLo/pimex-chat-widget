@@ -3,6 +3,8 @@ import App from './App.vue'
 import router from './router'
 import firebase from 'firebase'
 
+console.log('entro')
+
 const firebaseConfig = {
   apiKey: 'AIzaSyB6HDZ8XRXcGSu_tIHue0_MhIzXCacd7oY',
 
