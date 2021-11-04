@@ -3,6 +3,21 @@ import config from '../../config.json'
 
 const chatURL = config.chatsApi.url
 
+const getChat = async (id, boardData) => {
+  try {
+    const { data } = await axios.get(`${chatURL}/chats/${id}`, {
+      auth: {
+        username: boardData.id,
+        password: boardData.token
+      },
+      headers: { 'Access-Control-Allow-Origin': '*' }
+    })
+    return data
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 const updateChat = async (boardData, chatId, chatData) => {
   try {
     const { data } = await axios.put(`${chatURL}/chats/${chatId}`, chatData, {
@@ -33,4 +48,4 @@ const addMessage = async (boardData, MessageData) => {
   }
 }
 
-export { addMessage, updateChat }
+export { addMessage, updateChat, getChat }

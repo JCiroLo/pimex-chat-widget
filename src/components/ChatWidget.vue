@@ -13,7 +13,7 @@
             <span class="close_stripe_1"></span>
             <span class="close_stripe_2"></span>
           </button>
-          <img :src="chatData.agentInfo.logo" alt="" class="profile" />
+          <img :src="chatData.agentInfo.logo" :alt="chatData.agentInfo.name" class="profile"/>
           <div class="user_info">
             <h4>{{ chatData.agentInfo.name }}</h4>
             <small>Integrante de Pimex</small>
@@ -29,7 +29,7 @@
                 conversación
                 <svg class="svg-icon" viewBox="0 0 20 20">
                   <path
-                    d="M11.611,10.049l-4.76-4.873c-0.303-0.31-0.297-0.804,0.012-1.105c0.309-0.304,0.803-0.293,1.105,0.012l5.306,5.433c0.304,0.31,0.296,0.805-0.012,1.105L7.83,15.928c-0.152,0.148-0.35,0.223-0.547,0.223c-0.203,0-0.406-0.08-0.559-0.236c-0.303-0.309-0.295-0.803,0.012-1.104L11.611,10.049z"
+                      d="M11.611,10.049l-4.76-4.873c-0.303-0.31-0.297-0.804,0.012-1.105c0.309-0.304,0.803-0.293,1.105,0.012l5.306,5.433c0.304,0.31,0.296,0.805-0.012,1.105L7.83,15.928c-0.152,0.148-0.35,0.223-0.547,0.223c-0.203,0-0.406-0.08-0.559-0.236c-0.303-0.309-0.295-0.803,0.012-1.104L11.611,10.049z"
                   ></path>
                 </svg>
               </button>
@@ -39,16 +39,16 @@
             <div class="msg_history">
               <div class="we_use_pimex">
                 <img
-                  src="https://es.pimex.co/wp-content/uploads/2018/04/simbolo.png"
-                  alt="Pimex_logo"
+                    src="https://es.pimex.co/wp-content/uploads/2018/04/simbolo.png"
+                    alt="Pimex_logo"
                 />
                 <span>Usamos Pimex</span>
               </div>
               <div
-                v-for="(message, index) in messages"
-                :key="index"
-                class="chat_message"
-                :class="{
+                  v-for="(message, index) in messages"
+                  :key="index"
+                  class="chat_message"
+                  :class="{
                   received_msg: message.senderType === 'board',
                   bot_msg: message.senderType === 'bot',
                   outgoing_msg: message.senderType === 'client',
@@ -56,9 +56,9 @@
               >
                 <div class="message_content">
                   <div
-                    class="message_text"
-                    :class="{ 'too-large': message.message.length > 20 }"
-                    v-if="message.senderType !== 'bot'"
+                      class="message_text"
+                      :class="{ 'too-large': message.message.length > 20 }"
+                      v-if="message.senderType !== 'bot'"
                   >
                     {{ message.message }}
                   </div>
@@ -71,64 +71,64 @@
                     <div class="bot_msg_form">
                       <small v-if="formTab < 3">
                         <button
-                          :style="{
+                            :style="{
                             visibility: formTab > 0 ? 'visible' : 'hidden',
                           }"
-                          @click="formPrevTab()"
+                            @click="formPrevTab()"
                         >
                           Atrás
                         </button>
                         <span>({{ formTab + 1 }}/3)</span>
                       </small>
                       <transition
-                        :name="`form-tabs-to-${transitionState}`"
-                        mode="out-in"
+                          :name="`form-tabs-to-${transitionState}`"
+                          mode="out-in"
                       >
                         <form
-                          @submit.prevent="formNextTab()"
-                          class="form-control"
-                          v-if="formTab === 0"
-                          key="0"
+                            @submit.prevent="formNextTab()"
+                            class="form-control"
+                            v-if="formTab === 0"
+                            key="0"
                         >
                           <input
-                            type="email"
-                            v-model="chatUserInfo.email"
-                            placeholder="Correo electronico"
+                              type="email"
+                              v-model="chatUserInfo.email"
+                              placeholder="Correo electronico"
                           />
                           <button>
                             <i class="fas fa-paper-plane"></i>
                           </button>
                         </form>
                         <form
-                          @submit.prevent="formNextTab()"
-                          class="form-control"
-                          v-if="formTab === 1"
-                          key="1"
+                            @submit.prevent="formNextTab()"
+                            class="form-control"
+                            v-if="formTab === 1"
+                            key="1"
                         >
                           <input
-                            type="text"
-                            v-model="chatUserInfo.name"
-                            placeholder="Tu nombre"
+                              type="text"
+                              v-model="chatUserInfo.name"
+                              placeholder="Tu nombre"
                           />
                           <button>
                             <i class="fas fa-paper-plane"></i>
                           </button>
                         </form>
                         <form
-                          @submit.prevent="
+                            @submit.prevent="
                             () => {
                               formNextTab();
                               submitChatForm();
                             }
                           "
-                          class="form-control"
-                          v-if="formTab === 2"
-                          key="2"
+                            class="form-control"
+                            v-if="formTab === 2"
+                            key="2"
                         >
                           <input
-                            type="text"
-                            v-model="chatUserInfo.tel"
-                            placeholder="Tu teléfono"
+                              type="text"
+                              v-model="chatUserInfo.tel"
+                              placeholder="Tu teléfono"
                           />
                           <button>
                             <i class="fas fa-paper-plane"></i>
@@ -153,17 +153,17 @@
         <transition name="fade-footer" mode="out-in">
           <div class="we_use_pimex" v-if="currentTab === 0" key="1">
             <img
-              src="https://es.pimex.co/wp-content/uploads/2018/04/simbolo.png"
-              alt="Pimex_logo"
+                src="https://es.pimex.co/wp-content/uploads/2018/04/simbolo.png"
+                alt="Pimex_logo"
             />
             <span>Usamos Pimex</span>
           </div>
           <div class="input_msg_write" v-if="currentTab === 1" key="2">
             <input
-              @keyup.enter="sendMessage"
-              v-model="message"
-              type="text"
-              placeholder="Escribe un mensaje"
+                @keyup.enter="sendMessage"
+                v-model="message"
+                type="text"
+                placeholder="Escribe un mensaje"
             />
             <button class="msg_send_btn" type="button" @click="sendMessage">
               <i class="fas fa-paper-plane"></i>
@@ -178,15 +178,15 @@
 <script>
 import moment from "moment";
 // import {sendNotification} from "../lib/utils";
-import { addMessage, updateChat } from "../services/chat";
-import { addLead } from "../services/pimex";
+import {addMessage, getChat, updateChat} from "../services/chat";
+import {addLead} from "../services/pimex";
 
 export default {
   name: "ChatWidget",
   data() {
     return {
-      chatData: { id: "", userId: "", agentName: "", agentImg: "", name: "" },
-      chatUserInfo: { email: "", name: "", tel: "" },
+      chatData: {id: "", userId: "", agentName: "", agentImg: "", name: ""},
+      chatUserInfo: {email: "", name: "", tel: ""},
       chatModal: false,
       message: null,
       messages: [],
@@ -197,7 +197,7 @@ export default {
     };
   },
   filters: {
-    formatChatDate: ({ seconds }) => {
+    formatChatDate: ({seconds}) => {
       const msgDate = moment.unix(seconds).format("LL");
       const todayDate = moment().format("LL");
       const firstDay = moment(0).format("LL");
@@ -220,26 +220,28 @@ export default {
       this.currentTab = tabNumber;
     },
     async fetchName(chatId) {
-      const resChatData = await window.db
-        .collection("chats")
-        .doc(chatId)
-        .get();
-      this.chatData = resChatData.data();
+      console.log(chatId)
+      const resChatData = await getChat(chatId, this.boardData)
+      console.log(resChatData)
+      this.chatData = resChatData;
     },
     fetchMessages(chatId) {
       window.db
-        .collection("messages")
-        .where("chatId", "==", chatId)
-        .orderBy("createdAt")
-        .onSnapshot((querySnapshot) => {
-          const allMessages = [];
-          querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            data.id = doc.id;
-            allMessages.push(data);
+          .collection("messages")
+          .where("chatId", "==", chatId)
+          .orderBy("createdAt")
+          .onSnapshot((querySnapshot) => {
+            const allMessages = [];
+            querySnapshot.forEach((doc) => {
+              const data = doc.data();
+              data.id = doc.id;
+              allMessages.push(data);
+            });
+            this.messages = allMessages;
+            setTimeout(() => {
+              this.scrollToBottom();
+            }, 50);
           });
-          this.messages = allMessages;
-        });
     },
     async sendMessage() {
       if (this.message === null || this.message === "") {
@@ -280,10 +282,24 @@ export default {
       this.transitionState = "left";
       this.formTab--;
     },
-    formNextTab() {
-      this.transitionState = "right";
-      this.formTab++;
-      this.$track.event("chat.customer.fill-form", { step: this.formTab }); // Track
+    formNextTab(isEmail = false) {
+      if (isEmail) {
+        if (this.validEmail(this.chatUserInfo.email)) {
+          this.transitionState = "right";
+          this.formTab++;
+          this.$track.event("chat.customer.fill-form", {step: this.formTab}); // Track
+        } else {
+          console.log('email inválido')
+        }
+      } else {
+        this.transitionState = "right";
+        this.formTab++;
+        this.$track.event("chat.customer.fill-form", {step: this.formTab}); // Track
+      }
+    },
+    validEmail(email) {
+      const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
     },
     async submitChatForm() {
       const leadData = {
@@ -294,9 +310,8 @@ export default {
         project: this.boardData.id,
         referrer: "Chat",
         origin: "Chat",
-        _compare: false,
       };
-      const { data } = await addLead(leadData);
+      const {data} = await addLead(leadData);
       await updateChat(this.boardData, this.chatData.id, {
         leadId: data.ID,
         name: this.chatUserInfo.name,
@@ -328,11 +343,11 @@ $widget_height_footer: 66px;
 $widget_height_header: 200px;
 $widget_height_header_active: 75px;
 $widget_height_body: calc(
-  80vh - #{$widget_height_header} - #{$widget_height_footer} - #{$widget_y_gap *
+    80vh - #{$widget_height_header} - #{$widget_height_footer} - #{$widget_y_gap *
     2}
 );
 $widget_height_body_active: calc(
-  90vh - #{$widget_height_header_active} - #{$widget_height_footer} - #{$widget_y_gap *
+    90vh - #{$widget_height_header_active} - #{$widget_height_footer} - #{$widget_y_gap *
     2}
 );
 $widget_width: 100vw;
@@ -342,23 +357,29 @@ $widget_width: 100vw;
   bottom: $widget_y_gap;
   left: $widget_x_gap;
   right: $widget_x_gap;
+
   .inbox_msg {
     overflow: hidden;
     border-radius: 15px;
     box-shadow: 0 0 15px rgba($color: #555, $alpha: 0.25);
     background-color: white;
+
     ::-webkit-scrollbar {
       width: 7px;
     }
+
     ::-webkit-scrollbar-track {
       background: #f1f1f1;
     }
+
     ::-webkit-scrollbar-thumb {
       background: #bbb;
     }
+
     ::-webkit-scrollbar-thumb:hover {
       background: #999;
     }
+
     .inbox_header {
       display: flex;
       width: 100%;
@@ -366,10 +387,12 @@ $widget_width: 100vw;
       max-height: $widget_height_header;
       background-image: linear-gradient(45deg, #134251, #146e78);
       transition: min-height 0.1s ease-out;
+
       &.active {
         min-height: $widget_height_header_active;
         max-height: $widget_height_header_active;
       }
+
       .greeting_text {
         display: flex;
         flex-direction: column;
@@ -377,19 +400,23 @@ $widget_width: 100vw;
         color: white;
         padding: 15px;
         width: 100%;
+
         h4 {
           margin: 0;
           font-size: 28px;
         }
+
         p {
           margin: 15px 0;
         }
       }
+
       .chat_header {
         width: 100%;
         display: flex;
         align-items: center;
         padding: 0 15px;
+
         .go_back {
           position: relative;
           display: flex;
@@ -407,17 +434,21 @@ $widget_width: 100vw;
           padding: 0;
           color: white;
           transition: background-color 0.2s ease-out;
+
           &:hover {
             background-color: #eff4f833;
+
             .close_stripe_1 {
               min-width: 25px;
               transform: rotate(-45deg) translate(0, 0);
             }
+
             .close_stripe_2 {
               min-width: 25px;
               transform: rotate(45deg) translate(0, 0);
             }
           }
+
           .close_stripe_1 {
             position: absolute;
             background-color: white;
@@ -427,6 +458,7 @@ $widget_width: 100vw;
             transform: rotate(45deg) translate(50%, calc(50% - 2px));
             transition: all 0.2s ease-out;
           }
+
           .close_stripe_2 {
             position: absolute;
             background-color: white;
@@ -437,6 +469,7 @@ $widget_width: 100vw;
             transition: all 0.2s ease-out;
           }
         }
+
         .profile {
           margin-left: 10px;
           width: 50px;
@@ -444,6 +477,7 @@ $widget_width: 100vw;
           border-radius: 50%;
           object-fit: cover;
         }
+
         .icon {
           display: flex;
           align-items: center;
@@ -451,18 +485,21 @@ $widget_width: 100vw;
           height: 40px;
           padding: 5px;
         }
+
         .user_info {
           display: flex;
           flex-direction: column;
           align-items: flex-start;
           padding: 0 15px;
           color: #fff;
+
           h4 {
             text-align: left;
             margin: 0;
             font-size: 20px;
             font-weight: 200;
           }
+
           small {
             font-weight: 100;
             font-size: 12px;
@@ -470,6 +507,7 @@ $widget_width: 100vw;
         }
       }
     }
+
     .mesgs {
       display: flex;
       flex: 0 0 100%;
@@ -480,19 +518,23 @@ $widget_width: 100vw;
       scroll-behavior: smooth;
       margin-bottom: 30px;
       transition: min-height 0.1s ease-out, padding 0.1s ease-out;
+
       &.active {
         max-height: $widget_height_body_active;
         min-height: $widget_height_body_active;
         padding: 0;
       }
+
       .greeting {
         width: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
         padding-bottom: 15px;
+
         .begin_conversation {
           padding: 30px 0;
+
           button {
             display: flex;
             align-items: center;
@@ -508,6 +550,7 @@ $widget_width: 100vw;
             border: none;
             outline: none;
             transition: background-color 0.2s ease-out;
+
             &:hover {
               background-color: #eff4f8;
 
@@ -515,6 +558,7 @@ $widget_width: 100vw;
                 transform: translateX(10px);
               }
             }
+
             svg {
               width: 22px;
               transition: transform 0.2s ease-out;
@@ -526,9 +570,11 @@ $widget_width: 100vw;
           }
         }
       }
+
       .msgs_chat {
         display: flex;
         flex: 0 0 100%;
+
         .msg_history {
           display: flex;
           flex-direction: column;
@@ -536,17 +582,21 @@ $widget_width: 100vw;
           word-break: break-all;
           padding: 15px 15px 0 15px;
           background: #fff;
+
           .chat_message {
             position: relative;
             margin-bottom: 10px;
             max-width: 60%;
+
             .message_content {
               display: flex;
+
               &:hover {
                 .time_date {
                   opacity: 1;
                 }
               }
+
               .message_text {
                 width: 100%;
                 border-radius: 5px;
@@ -556,6 +606,7 @@ $widget_width: 100vw;
                 text-align: left;
                 word-wrap: break-word;
                 word-break: keep-all;
+
                 &.too-large {
                   word-break: break-all;
                 }
@@ -577,6 +628,7 @@ $widget_width: 100vw;
 
             &.received_msg {
               align-self: flex-start;
+
               &::before {
                 content: "";
                 position: absolute;
@@ -588,20 +640,24 @@ $widget_width: 100vw;
                 border-bottom: 6px solid transparent;
                 transition: border-color 0.2s ease-out;
               }
+
               .message_content {
                 .message_text {
                   background-color: #eff4f8;
                   color: #646464;
                   border-bottom-left-radius: 0;
                 }
+
                 .time_date {
                   left: 100%;
                   color: #747474;
                 }
               }
             }
+
             &.outgoing_msg {
               align-self: flex-end;
+
               &::before {
                 content: "";
                 position: absolute;
@@ -613,19 +669,23 @@ $widget_width: 100vw;
                 border-bottom: 3px solid transparent;
                 transition: border-color 0.2s ease-out;
               }
+
               .message_content {
                 .message_text {
                   background-color: #146478;
                   border-bottom-right-radius: 0;
                   color: #fff;
                 }
+
                 .time_date {
                   right: 100%;
                 }
               }
             }
+
             &.bot_msg {
               align-self: flex-start;
+
               &::before {
                 content: "";
                 position: absolute;
@@ -637,17 +697,20 @@ $widget_width: 100vw;
                 border-bottom: 6px solid transparent;
                 transition: border-color 0.2s ease-out;
               }
+
               .message_content {
                 .message_text {
                   background-color: #eff4f8;
                   color: #646464;
                   border-bottom-left-radius: 0;
                 }
+
                 .bot_msg_form {
                   position: relative;
                   display: flex;
                   flex-direction: column;
                   overflow-x: hidden;
+
                   small {
                     display: flex;
                     justify-content: space-between;
@@ -664,9 +727,11 @@ $widget_width: 100vw;
                       cursor: pointer;
                     }
                   }
+
                   .form-control {
                     display: flex;
                     width: 100%;
+
                     input {
                       height: 30px;
                       width: 100%;
@@ -675,6 +740,7 @@ $widget_width: 100vw;
                       outline: none;
                       border-radius: 5px;
                     }
+
                     button {
                       position: absolute;
                       display: flex;
@@ -696,6 +762,7 @@ $widget_width: 100vw;
                     }
                   }
                 }
+
                 .time_date {
                   left: 100%;
                   color: #747474;
@@ -703,6 +770,7 @@ $widget_width: 100vw;
               }
             }
           }
+
           .we_use_pimex {
             position: absolute;
             display: flex;
@@ -719,14 +787,17 @@ $widget_width: 100vw;
             opacity: 0.5;
             font-size: 12px;
             transition: background-color 0.2s ease-out, opacity 0.2s ease-out;
+
             &:hover {
               background-color: #eff4f8;
               cursor: pointer;
               opacity: 1;
             }
+
             img {
               height: 100%;
             }
+
             span {
               margin-left: 10px;
             }
@@ -734,20 +805,24 @@ $widget_width: 100vw;
         }
       }
     }
+
     .inbox_footer {
       display: flex;
       justify-content: center;
       align-items: flex-end;
       height: $widget_height_footer;
       transition: box-shadow 0.2s ease-out;
+
       &.active {
         box-shadow: 0 0 15px #00000011;
       }
+
       .input_msg_write {
         position: relative;
         display: flex;
         flex-basis: 100%;
         padding: 10px;
+
         input {
           flex-basis: 100%;
           padding: 15px;
@@ -756,6 +831,7 @@ $widget_width: 100vw;
           outline: none;
           border: none;
         }
+
         .msg_send_btn {
           position: absolute;
           display: flex;
@@ -773,6 +849,7 @@ $widget_width: 100vw;
           transform: translateY(-50%);
         }
       }
+
       .we_use_pimex {
         height: 20px;
         width: fit-content;
@@ -785,14 +862,17 @@ $widget_width: 100vw;
         font-size: 12px;
         opacity: 0.75;
         transition: background-color 0.2s ease-out, opacity 0.2s ease-out;
+
         &:hover {
           background-color: #eff4f8;
           cursor: pointer;
           opacity: 1;
         }
+
         img {
           height: 100%;
         }
+
         span {
           margin-left: 10px;
         }
