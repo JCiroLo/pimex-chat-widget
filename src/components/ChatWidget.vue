@@ -220,9 +220,7 @@ export default {
       this.currentTab = tabNumber;
     },
     async fetchName(chatId) {
-      console.log(chatId)
       const resChatData = await getChat(chatId, this.boardData)
-      console.log(resChatData)
       this.chatData = resChatData;
     },
     fetchMessages(chatId) {
@@ -295,6 +293,9 @@ export default {
         this.transitionState = "right";
         this.formTab++;
         this.$track.event("chat.customer.fill-form", {step: this.formTab}); // Track
+        if (this.formTab === 3 && this.chatUserInfo.email === "" && this.chatUserInfo.tel === "" && this.chatUserInfo.name === ""){
+          this.formPrevTab();
+        }
       }
     },
     validEmail(email) {
