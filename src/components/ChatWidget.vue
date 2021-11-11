@@ -9,7 +9,7 @@
           </p>
         </div>
         <div class="chat_header" v-if="currentTab === 1">
-          <button class="go_back" @click="goToTab(0)" v-if="currentTab != 0">
+          <button class="go_back" @click="goToTab(0)" v-if="currentTab !== 0">
             <span class="close_stripe_1"></span>
             <span class="close_stripe_2"></span>
           </button>
@@ -58,7 +58,7 @@
                   <div
                       class="message_text"
                       :class="{ 'too-large': message.message.length > 20 }"
-                      v-if="message.senderType !== 'bot'"
+                      v-if="message.senderType !== 'bot' || chatData.leadId"
                   >
                     {{ message.message }}
                   </div>
@@ -69,7 +69,7 @@
                       mas pronto posible
                     </span>
                     <div class="bot_msg_form">
-                      <small v-if="formTab < 3">
+                      <small v-if="formTab < 3 && message.last">
                         <button
                             :style="{
                             visibility: formTab > 0 ? 'visible' : 'hidden',
@@ -84,58 +84,57 @@
                           :name="`form-tabs-to-${transitionState}`"
                           mode="out-in"
                       >
-                        <form
-                            @submit.prevent="formNextTab()"
-                            class="form-control"
-                            v-if="formTab === 0"
-                            key="0"
-                        >
-                          <input
-                              type="email"
-                              v-model="chatUserInfo.email"
-                              placeholder="Correo electronico"
-                          />
-                          <button>
-                            <i class="fas fa-paper-plane"></i>
-                          </button>
-                        </form>
-                        <form
-                            @submit.prevent="formNextTab()"
-                            class="form-control"
-                            v-if="formTab === 1"
-                            key="1"
-                        >
-                          <input
-                              type="text"
-                              v-model="chatUserInfo.name"
-                              placeholder="Tu nombre"
-                          />
-                          <button>
-                            <i class="fas fa-paper-plane"></i>
-                          </button>
-                        </form>
-                        <form
-                            @submit.prevent="
-                            () => {
-                              formNextTab();
-                              submitChatForm();
-                            }
-                          "
-                            class="form-control"
-                            v-if="formTab === 2"
-                            key="2"
-                        >
-                          <input
-                              type="text"
-                              v-model="chatUserInfo.tel"
-                              placeholder="Tu teléfono"
-                          />
-                          <button>
-                            <i class="fas fa-paper-plane"></i>
-                          </button>
-                        </form>
-                        <div class="form-control" v-if="formTab === 3" key="3">
-                          Gracias, ¡Nos pondremos en contacto!
+                        <div v-if="message.last">
+                          <form
+                              @submit.prevent="formNextTab()"
+                              class="form-control"
+                              v-if="formTab === 0"
+                              key="0"
+                          >
+                            <input
+                                type="email"
+                                v-model="chatUserInfo.email"
+                                placeholder="Correo electronico"
+                            />
+                            <button>
+                              <i class="fas fa-paper-plane"></i>
+                            </button>
+                          </form>
+                          <form
+                              @submit.prevent="formNextTab()"
+                              class="form-control"
+                              v-if="formTab === 1"
+                              key="1"
+                          >
+                            <input
+                                type="text"
+                                v-model="chatUserInfo.name"
+                                placeholder="Tu nombre"
+                            />
+                            <button>
+                              <i class="fas fa-paper-plane"></i>
+                            </button>
+                          </form>
+                          <form
+                              @submit.prevent="
+                              () => {
+                                formNextTab();
+                                submitChatForm();
+                              }
+                            "
+                              class="form-control"
+                              v-if="formTab === 2"
+                              key="2"
+                          >
+                            <input
+                                type="text"
+                                v-model="chatUserInfo.tel"
+                                placeholder="Tu teléfono"
+                            />
+                            <button>
+                              <i class="fas fa-paper-plane"></i>
+                            </button>
+                          </form>
                         </div>
                       </transition>
                     </div>
@@ -177,7 +176,6 @@
 
 <script>
 import moment from "moment";
-// import {sendNotification} from "../lib/utils";
 import {addMessage, getChat, updateChat} from "../services/chat";
 import {addLead} from "../services/pimex";
 
@@ -193,7 +191,7 @@ export default {
       currentTab: 0,
       formTab: 0,
       boardData: {},
-      transitionState: "right",
+      transitionState: "right"
     };
   },
   filters: {
@@ -220,8 +218,7 @@ export default {
       this.currentTab = tabNumber;
     },
     async fetchName(chatId) {
-      const resChatData = await getChat(chatId, this.boardData)
-      this.chatData = resChatData;
+      this.chatData = await getChat(chatId, this.boardData);
     },
     fetchMessages(chatId) {
       window.db
@@ -233,8 +230,10 @@ export default {
             querySnapshot.forEach((doc) => {
               const data = doc.data();
               data.id = doc.id;
+              data.last = false;
               allMessages.push(data);
             });
+            allMessages[allMessages.length - 1].last = true
             this.messages = allMessages;
             setTimeout(() => {
               this.scrollToBottom();
@@ -255,6 +254,9 @@ export default {
         createdAt: new Date(),
       };
       this.messages.push(info);
+      setTimeout(() => {
+        this.scrollToBottom();
+      }, 50);
       this.message = null;
       try {
         await addMessage(this.boardData, info);
@@ -262,11 +264,6 @@ export default {
       } catch (e) {
         this.message = info.message;
       }
-      setTimeout(() => {
-        this.scrollToBottom();
-      }, 50);
-      // TODO la notificacion
-      // sendNotification(this.boardData.id, msg)
     },
     openAndCloseChat() {
       this.currentTab = 0;
@@ -293,7 +290,7 @@ export default {
         this.transitionState = "right";
         this.formTab++;
         this.$track.event("chat.customer.fill-form", {step: this.formTab}); // Track
-        if (this.formTab === 3 && this.chatUserInfo.email === "" && this.chatUserInfo.tel === "" && this.chatUserInfo.name === ""){
+        if (this.formTab === 3 && this.chatUserInfo.email === "" && this.chatUserInfo.tel === "" && this.chatUserInfo.name === "") {
           this.formPrevTab();
         }
       }
@@ -303,6 +300,8 @@ export default {
       return re.test(email);
     },
     async submitChatForm() {
+      this.chatData.leadId = "someId"
+      this.chatData.submitedForm = true
       const leadData = {
         _state: "lead",
         name: this.chatUserInfo.name,
@@ -312,13 +311,29 @@ export default {
         referrer: "Chat",
         origin: "Chat",
       };
-      const {data} = await addLead(leadData);
-      await updateChat(this.boardData, this.chatData.id, {
-        leadId: data.ID,
-        name: this.chatUserInfo.name,
-        submitedForm: true,
-      });
-      this.$track.event("chat.customer.create-lead"); // Track
+      try {
+        const {data} = await addLead(leadData);
+        await updateChat(this.boardData, this.chatData.id, {
+          leadId: data.ID,
+          name: this.chatUserInfo.name,
+          submitedForm: true,
+        });
+        this.chatData.leadId = data.ID
+        this.chatData.submitedForm = true
+        const info = {
+          boardId: this.boardData.id,
+          msg: "Gracias, ¡Nos pondremos en contacto!",
+          message: this.message,
+          chatId: this.chatData.id,
+          senderId: this.chatData.userId,
+          senderType: "bot",
+          createdAt: new Date(),
+        };
+        await addMessage(this.boardData, info);
+        this.$track.event("chat.customer.create-lead"); // Track
+      } catch (e) {
+        console.log(e)
+      }
     },
   },
   async beforeMount() {
