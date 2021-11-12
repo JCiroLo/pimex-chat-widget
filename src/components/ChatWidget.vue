@@ -68,6 +68,10 @@
                       tus dudas, dejanos tu correo para contactarnos contigo lo
                       mas pronto posible
                     </span>
+                    <p class="form_warning" v-if="formVerification">
+                        Debe completar el campo de correo o telefono antes de
+                        enviar el formulario
+                    </p>
                     <div class="bot_msg_form">
                       <small v-if="formTab < 3 && message.last">
                         <button
@@ -119,7 +123,6 @@
                               @submit.prevent="
                               () => {
                                 formNextTab();
-                                submitChatForm();
                               }
                             "
                               class="form-control"
@@ -191,7 +194,8 @@ export default {
       currentTab: 0,
       formTab: 0,
       boardData: {},
-      transitionState: "right"
+      transitionState: "right",
+      formVerification: false
     };
   },
   filters: {
@@ -290,8 +294,15 @@ export default {
         this.transitionState = "right";
         this.formTab++;
         this.$track.event("chat.customer.fill-form", {step: this.formTab}); // Track
-        if (this.formTab === 3 && this.chatUserInfo.email === "" && this.chatUserInfo.tel === "" && this.chatUserInfo.name === "") {
+        if (this.formTab === 3 && this.chatUserInfo.email === "" && this.chatUserInfo.tel === "") {
           this.formPrevTab();
+          this.formVerification = true;
+        }
+        else if (this.formTab === 3 && (this.chatUserInfo.email !== "" || this.chatUserInfo.tel !== "")) {
+          this.submitChatForm();
+        }
+        else {
+          this.formVerification = false;
         }
       }
     },
@@ -624,7 +635,7 @@ $widget_width: 100vw;
                 word-break: keep-all;
 
                 &.too-large {
-                  word-break: break-all;
+                  word-wrap: break-word;
                 }
               }
 
@@ -719,6 +730,11 @@ $widget_width: 100vw;
                   background-color: #eff4f8;
                   color: #646464;
                   border-bottom-left-radius: 0;
+                }
+
+                .form_warning{
+                  color: #df3737;
+                  font-size: 12px;
                 }
 
                 .bot_msg_form {
@@ -842,6 +858,7 @@ $widget_width: 100vw;
         input {
           flex-basis: 100%;
           padding: 15px;
+          padding-right: 45px;
           border-radius: 15px;
           background-color: #eff4f8;
           outline: none;
