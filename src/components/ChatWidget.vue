@@ -242,6 +242,8 @@ export default {
             setTimeout(() => {
               this.scrollToBottom();
             }, 50);
+            const audio = new Audio('https://es.pimex.co/wp-content/uploads/2021/08/notification.mp3')
+            audio.play()
           });
     },
     async sendMessage() {
