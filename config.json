@@ -4,7 +4,7 @@
     "token": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjExMiwiaWF0IjoxNTc0MTQ3MjA3fQ.YYdQd7sLHSbKLmRDVSqvAG3Y5VaaxXspUUzhfYKRLLg"
   },
   "chatsApi": {
-    "url": "http://localhost:5000"
+    "url": "https://pimex-chat-api-v1.herokuapp.com"
   },
   "mixpanel": {
     "token": "4eb2ba43842cf4f6f3d91af158012213"
