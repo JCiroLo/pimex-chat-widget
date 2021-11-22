@@ -37,7 +37,7 @@
           </div>
           <div class="msgs_chat" key="1" v-if="currentTab === 1">
             <div class="msg_history">
-              <div class="we_use_pimex">
+              <div class="we_use_pimex" v-on:click="redirectTo('https://es.pimex.co/')">
                 <img
                     src="https://es.pimex.co/wp-content/uploads/2018/04/simbolo.png"
                     alt="Pimex_logo"
@@ -64,13 +64,14 @@
                   </div>
                   <div class="message_text" v-else>
                     <span v-if="formTab < 3">
-                      Por el momento no hay asesores disponibles para resolver
-                      tus dudas, dejanos tu correo para contactarnos contigo lo
-                      mas pronto posible
+                      En el momento no tenemos asesores disponibles.
+                      Sin embargo te invitamos a dejarnos tus datos y te
+                      contactaremos tan pronto sea posible
+
                     </span>
                     <p class="form_warning" v-if="formVerification">
-                        Debe completar el campo de correo o telefono antes de
-                        enviar el formulario
+                      Debe completar el campo de correo o telefono antes de
+                      enviar el formulario
                     </p>
                     <div class="bot_msg_form">
                       <small v-if="formTab < 3 && message.last">
@@ -98,7 +99,7 @@
                             <input
                                 type="email"
                                 v-model="chatUserInfo.email"
-                                placeholder="Correo electronico"
+                                placeholder="Correo electrónico"
                             />
                             <button>
                               <i class="fas fa-paper-plane"></i>
@@ -153,7 +154,7 @@
       </div>
       <div class="inbox_footer" :class="{ active: currentTab === 0 }">
         <transition name="fade-footer" mode="out-in">
-          <div class="we_use_pimex" v-if="currentTab === 0" key="1">
+          <div class="we_use_pimex" v-if="currentTab === 0" key="1" v-on:click="redirectTo('https://es.pimex.co/')">
             <img
                 src="https://es.pimex.co/wp-content/uploads/2018/04/simbolo.png"
                 alt="Pimex_logo"
@@ -213,6 +214,9 @@ export default {
     },
   },
   methods: {
+    redirectTo(url) {
+      window.open(url)
+    },
     goToTab(tabNumber) {
       if (tabNumber === 1) {
         setTimeout(() => {
@@ -299,11 +303,9 @@ export default {
         if (this.formTab === 3 && this.chatUserInfo.email === "" && this.chatUserInfo.tel === "") {
           this.formPrevTab();
           this.formVerification = true;
-        }
-        else if (this.formTab === 3 && (this.chatUserInfo.email !== "" || this.chatUserInfo.tel !== "")) {
+        } else if (this.formTab === 3 && (this.chatUserInfo.email !== "" || this.chatUserInfo.tel !== "")) {
           this.submitChatForm();
-        }
-        else {
+        } else {
           this.formVerification = false;
         }
       }
@@ -734,7 +736,7 @@ $widget_width: 100vw;
                   border-bottom-left-radius: 0;
                 }
 
-                .form_warning{
+                .form_warning {
                   color: #df3737;
                   font-size: 12px;
                 }
