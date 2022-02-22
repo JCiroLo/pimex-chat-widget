@@ -18,6 +18,17 @@ const updateChat = async (boardData, chatId, chatData) => {
   }
 }
 
+const createLead = async (boardData, leadData) => {
+  const { data } = await axios.post(`${chatURL}/leads`, leadData, {
+    auth: {
+      username: boardData.id,
+      password: boardData.token
+    },
+    headers: { 'Access-Control-Allow-Origin': '*' }
+  })
+  return data
+}
+
 const addMessage = async (boardData, MessageData) => {
   try {
     const { data } = await axios.post(`${chatURL}/messages`, MessageData, {
@@ -33,4 +44,4 @@ const addMessage = async (boardData, MessageData) => {
   }
 }
 
-export { addMessage, updateChat }
+export { addMessage, updateChat, createLead }

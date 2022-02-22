@@ -1,0 +1,176 @@
+<div class="chat-container">
+  <div class="inbox_msg">
+    <div class="inbox_header" :class="{ active: currentTab === 1 }">
+      <div class="greeting_text" v-if="currentTab === 0">
+        <h4>Hola {{ `${chatData.name.split(" ")[0]} ` }}👋</h4>
+        <p>
+          Pregúntanos lo que quieras y comparte con nosotros tus comentarios
+        </p>
+      </div>
+      <div class="chat_header" v-if="currentTab === 1">
+        <button class="go_back" @click="goToTab(0)" v-if="currentTab != 0">
+          <span class="close_stripe_1"></span>
+          <span class="close_stripe_2"></span>
+        </button>
+        <img :src="chatData.agentInfo.logo" alt="" class="profile" />
+        <div class="user_info">
+          <h4>{{ chatData.agentInfo.name }}</h4>
+          <small>Integrante de Pimex</small>
+        </div>
+      </div>
+    </div>
+    <div class="mesgs" ref="chatRef" :class="{ active: currentTab === 1 }">
+      <transition name="fade-tabs" mode="out-in">
+        <div class="greeting" key="0" v-if="currentTab === 0">
+          <div class="begin_conversation">
+            <transition name="loading-messages" mode="out-in">
+              <button @click="goToTab(1)" v-if="!loadingMessages">
+                {{ messages.length > 0 ? "Continuar" : "Iniciar" }} conversación
+                <svg class="svg-icon" viewBox="0 0 20 20">
+                  <path
+                    d="M11.611,10.049l-4.76-4.873c-0.303-0.31-0.297-0.804,0.012-1.105c0.309-0.304,0.803-0.293,1.105,0.012l5.306,5.433c0.304,0.31,0.296,0.805-0.012,1.105L7.83,15.928c-0.152,0.148-0.35,0.223-0.547,0.223c-0.203,0-0.406-0.08-0.559-0.236c-0.303-0.309-0.295-0.803,0.012-1.104L11.611,10.049z"
+                  ></path>
+                </svg>
+              </button>
+              <div class="loader" v-else />
+            </transition>
+          </div>
+        </div>
+        <div class="msgs_chat" key="1" v-if="currentTab === 1">
+          <div class="msg_history">
+            <div class="we_use_pimex">
+              <img
+                src="https://es.pimex.co/wp-content/uploads/2018/04/simbolo.png"
+                alt="Pimex_logo"
+              />
+              <span>Usamos Pimex</span>
+            </div>
+            <div
+              v-for="(message, index) in messages"
+              :key="index"
+              class="chat_message"
+              :class="{
+                received_msg: message.senderType === 'board',
+                bot_msg: message.senderType === 'bot',
+                outgoing_msg: message.senderType === 'client',
+              }"
+            >
+              <div class="message_content">
+                <div
+                  class="message_text"
+                  :class="{ 'too-large': message.message.length > 20 }"
+                  v-if="message.senderType !== 'bot'"
+                >
+                  {{ message.message }}
+                </div>
+                <div class="message_text" v-else>
+                  <span v-if="formTab < 3">
+                    Por el momento no hay asesores disponibles para resolver tus
+                    dudas, dejanos tu correo para contactarnos contigo lo mas
+                    pronto posible
+                  </span>
+                  <div class="bot_msg_form">
+                    <small v-if="formTab < 3">
+                      <button
+                        :style="{
+                          visibility: formTab > 0 ? 'visible' : 'hidden',
+                        }"
+                        @click="formPrevTab()"
+                      >
+                        Atrás
+                      </button>
+                      <span>({{ formTab + 1 }}/3)</span>
+                    </small>
+                    <transition
+                      :name="`form-tabs-to-${transitionState}`"
+                      mode="out-in"
+                    >
+                      <form
+                        @submit.prevent="formNextTab()"
+                        class="form-control"
+                        v-if="formTab === 0"
+                        key="0"
+                      >
+                        <input
+                          type="email"
+                          v-model="chatUserInfo.email"
+                          placeholder="Correo electronico"
+                        />
+                        <button>
+                          <i class="fas fa-paper-plane"></i>
+                        </button>
+                      </form>
+                      <form
+                        @submit.prevent="formNextTab()"
+                        class="form-control"
+                        v-if="formTab === 1"
+                        key="1"
+                      >
+                        <input
+                          type="text"
+                          v-model="chatUserInfo.name"
+                          placeholder="Tu nombre"
+                        />
+                        <button>
+                          <i class="fas fa-paper-plane"></i>
+                        </button>
+                      </form>
+                      <form
+                        @submit.prevent="
+                          () => {
+                            formNextTab();
+                            submitChatForm();
+                          }
+                        "
+                        class="form-control"
+                        v-if="formTab === 2"
+                        key="2"
+                      >
+                        <input
+                          type="text"
+                          v-model="chatUserInfo.tel"
+                          placeholder="Tu teléfono"
+                        />
+                        <button>
+                          <i class="fas fa-paper-plane"></i>
+                        </button>
+                      </form>
+                      <div class="form-control" v-if="formTab === 3" key="3">
+                        Gracias, ¡Nos pondremos en contacto!
+                      </div>
+                    </transition>
+                  </div>
+                </div>
+                <span class="time_date">
+                  {{ message.createdAt | formatChatDate }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </div>
+    <div class="inbox_footer" :class="{ active: currentTab === 0 }">
+      <transition name="fade-footer" mode="out-in">
+        <div class="we_use_pimex" v-if="currentTab === 0" key="1">
+          <img
+            src="https://es.pimex.co/wp-content/uploads/2018/04/simbolo.png"
+            alt="Pimex_logo"
+          />
+          <span>Usamos Pimex</span>
+        </div>
+        <div class="input_msg_write" v-if="currentTab === 1" key="2">
+          <input
+            @keyup.enter="sendMessage"
+            v-model="message"
+            type="text"
+            placeholder="Escribe un mensaje"
+          />
+          <button class="msg_send_btn" type="button" @click="sendMessage">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </transition>
+    </div>
+  </div>
+</div>

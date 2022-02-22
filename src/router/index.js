@@ -8,13 +8,13 @@ const routes = [
     path: '/',
     name: 'greeting',
     component: () =>
-      import(/* webpackChunkName: "greeting" */ '@/components/Greeting.vue')
+      import(/* webpackChunkName: "greeting" */ '@/views/Greeting.vue')
   },
   {
     path: '/:userId/:chatId/:boardId/:boardToken',
     name: 'chat',
     component: () =>
-      import(/* webpackChunkName: "chat" */ '@/components/ChatWidget.vue')
+      import(/* webpackChunkName: "chat" */ '@/views/Chat/index.vue')
   }
 ]
 
