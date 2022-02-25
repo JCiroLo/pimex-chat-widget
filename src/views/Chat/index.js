@@ -1,7 +1,6 @@
 import moment from 'moment'
 // import {sendNotification} from "../lib/utils";
-import { addMessage, updateChat, createLead } from '../../services/chat'
-import { io } from 'socket.io-client'
+import { updateChat, createLead } from '../../services/chat'
 
 export default {
   name: 'ChatWidget',
@@ -33,6 +32,18 @@ export default {
       }
     }
   },
+  sockets: {
+    connect () {},
+    fetchMessages (messages) {
+      this.messages = messages
+    },
+    getMessage (message) {
+      this.messages.push(message)
+      setTimeout(() => {
+        this.scrollToBottom()
+      }, 50)
+    }
+  },
   methods: {
     goToTab (tabNumber) {
       if (tabNumber === 1) {
@@ -49,8 +60,8 @@ export default {
         .get()
       this.chatData = resChatData.data()
     },
-    fetchMessages (chatId) {
-      window.db
+    fetchMessages () {
+      /* window.db
         .collection('messages')
         .where('chatId', '==', chatId)
         .orderBy('createdAt')
@@ -62,29 +73,29 @@ export default {
             allMessages.push(data)
           })
           this.messages = allMessages
-        })
+        }) */
     },
     async sendMessage () {
       if (this.message === null || this.message === '') {
         return
       }
-      const info = {
+      const messageData = {
         boardId: this.boardData.id,
-        msg: this.message,
         message: this.message,
         chatId: this.chatData.id,
         senderId: this.chatData.userId,
         senderType: 'client',
         createdAt: new Date()
       }
-      this.messages.push(info)
+      this.messages.push(messageData)
       this.message = null
-      try {
-        await addMessage(this.boardData, info)
+      this.$socket.emit('sendMessage', messageData)
+      /* try {
+        await addMessage(this.boardData, messageData)
         this.$track.event('chat.customer.send-message') // Track
       } catch (e) {
-        this.message = info.message
-      }
+        this.message = messageData.message
+      } */
       setTimeout(() => {
         this.scrollToBottom()
       }, 50)
@@ -126,7 +137,8 @@ export default {
         submitedForm: true
       })
       this.$track.event('chat.customer.create-lead.bot-message') // Track
-    }
+    },
+    test () {}
   },
   async beforeMount () {
     await this.fetchName(this.$route.params.chatId)
@@ -141,10 +153,10 @@ export default {
     if (this.chatData.submitedForm) {
       this.formTab = 3
     }
-    const socket = io('http://localhost:5000')
 
-    socket.on('message', message => {
-      console.log(message)
+    this.$socket.emit('joinChat', {
+      userId: this.chatData.userId,
+      chatId: this.chatData.id
     })
   }
 }

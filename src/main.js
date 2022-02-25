@@ -1,4 +1,6 @@
 import Vue from 'vue'
+import VueSocketIO from 'vue-socket.io'
+import SocketIO from 'socket.io-client'
 import App from './App.vue'
 import router from './router'
 import firebase from '@/lib/firebase'
@@ -10,6 +12,11 @@ window.firestore = firebase.firestore
 Vue.config.productionTip = false
 
 Vue.use(tracking)
+Vue.use(
+  new VueSocketIO({
+    connection: SocketIO('http://localhost:5000')
+  })
+)
 
 new Vue({
   router,
