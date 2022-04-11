@@ -213,11 +213,6 @@ $widget_width: 100vw;
             max-width: 60%;
             .message_content {
               display: flex;
-              &:hover {
-                .time_date {
-                  opacity: 1;
-                }
-              }
               .message_text {
                 width: 100%;
                 border-radius: 5px;
@@ -241,7 +236,7 @@ $widget_width: 100vw;
                 bottom: 0;
                 font-size: 10px;
                 margin: 0 10px;
-                opacity: 0;
+                opacity: 1;
                 transition: opacity 0.2s ease-out;
               }
             }

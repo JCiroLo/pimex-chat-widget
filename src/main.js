@@ -14,7 +14,7 @@ Vue.config.productionTip = false
 Vue.use(tracking)
 Vue.use(
   new VueSocketIO({
-    connection: SocketIO('http://localhost:5000')
+    connection: SocketIO('https://socket.pimex.services/')
   })
 )
 

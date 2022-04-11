@@ -1,6 +1,12 @@
 import moment from 'moment'
 // import {sendNotification} from "../lib/utils";
-import { updateChat, createLead } from '../../services/chat'
+import {
+  updateChat,
+  createLead,
+  fetchChat,
+  fetchMessages,
+  sendMessage
+} from '../../services/chat'
 
 export default {
   name: 'ChatWidget',
@@ -8,7 +14,6 @@ export default {
     return {
       chatData: { id: '', userId: '', agentName: '', agentImg: '', name: '' },
       chatUserInfo: { email: '', name: '', tel: '' },
-      chatModal: false,
       message: null,
       messages: [],
       currentTab: 0,
@@ -19,66 +24,76 @@ export default {
     }
   },
   filters: {
-    formatChatDate: ({ seconds }) => {
-      const msgDate = moment.unix(seconds).format('LL')
+    formatChatDate: ({ _seconds }) => {
+      const msgDate = moment.unix(_seconds).format('LL')
       const todayDate = moment().format('LL')
       const firstDay = moment(0).format('LL')
       const diffToday = moment(todayDate).diff(moment(firstDay), 'days')
       const diffMsg = moment(msgDate).diff(moment(firstDay), 'days')
       if (Math.abs(diffToday - diffMsg) >= 1) {
-        return moment.unix(seconds).format('MMMM DD - hh:mm A')
+        return moment.unix(_seconds).format('MMMM DD - hh:mm A')
       } else {
-        return moment.unix(seconds).format('hh:mm A')
+        return moment.unix(_seconds).format('hh:mm A')
       }
     }
   },
   sockets: {
-    connect () {},
-    fetchMessages (messages) {
-      this.messages = messages
+    connect () {
+      console.log('Chat socket connected')
     },
-    getMessage (message) {
-      this.messages.push(message)
-      setTimeout(() => {
-        this.scrollToBottom()
-      }, 50)
+    'chat.message.created.user' (data) {
+      if (
+        this.chatData.id === data.message.chatId &&
+        data.message.senderType !== 'client'
+      ) {
+        this.messages.push(data.message)
+        this.scrollToBottom(50)
+      }
+    },
+    'chat.message.created.bot' (data) {
+      if (this.chatData.id === data.message.chatId) {
+        this.messages.push(data.message)
+        this.scrollToBottom(50)
+      }
+    },
+    getMessage (messageData) {
+      if (this.$route.params.userId !== messageData.senderId) {
+        this.messages.push(messageData)
+      }
+      this.scrollToBottom(50)
+    },
+    getBotMessage (messageData) {
+      this.messages.push(messageData)
+      this.scrollToBottom(50)
     }
   },
   methods: {
+    async fetchChatData () {
+      this.chatData = await fetchChat(this.$route.params.chatId)
+      this.chatData.userId = this.$route.params.userId
+      this.chatData.id = this.$route.params.chatId
+      this.boardData = {
+        id: this.$route.params.boardId,
+        token: this.$route.params.boardToken
+      }
+      if (this.chatData.submitedForm) {
+        this.formTab = 3
+      }
+    },
+    async fetchChatMessages () {
+      this.messages = await fetchMessages(this.$route.params.chatId)
+    },
     goToTab (tabNumber) {
       if (tabNumber === 1) {
-        setTimeout(() => {
-          this.scrollToBottom()
-        }, 500)
+        this.scrollToBottom(300)
       }
       this.currentTab = tabNumber
     },
-    async fetchName (chatId) {
-      const resChatData = await window.db
-        .collection('chats')
-        .doc(chatId)
-        .get()
-      this.chatData = resChatData.data()
-    },
-    fetchMessages () {
-      /* window.db
-        .collection('messages')
-        .where('chatId', '==', chatId)
-        .orderBy('createdAt')
-        .onSnapshot(querySnapshot => {
-          const allMessages = []
-          querySnapshot.forEach(doc => {
-            const data = doc.data()
-            data.id = doc.id
-            allMessages.push(data)
-          })
-          this.messages = allMessages
-        }) */
-    },
     async sendMessage () {
-      if (this.message === null || this.message === '') {
+      if (!this.message) {
         return
       }
+
       const messageData = {
         boardId: this.boardData.id,
         message: this.message,
@@ -87,28 +102,20 @@ export default {
         senderType: 'client',
         createdAt: new Date()
       }
-      this.messages.push(messageData)
+
       this.message = null
-      this.$socket.emit('sendMessage', messageData)
-      /* try {
-        await addMessage(this.boardData, messageData)
-        this.$track.event('chat.customer.send-message') // Track
-      } catch (e) {
-        this.message = messageData.message
-      } */
+      this.messages.push(messageData)
+      this.scrollToBottom(50)
+
+      await sendMessage(messageData)
+
+      this.$track.event('chat.customer.send-message') // Track
+    },
+    scrollToBottom (time) {
       setTimeout(() => {
-        this.scrollToBottom()
-      }, 50)
-      // TODO la notificacion
-      // sendNotification(this.boardData.id, msg)
-    },
-    openAndCloseChat () {
-      this.currentTab = 0
-      this.chatModal = !this.chatModal
-    },
-    scrollToBottom () {
-      const box = this.$refs.chatRef
-      box.scrollTop = box.scrollHeight
+        const box = this.$refs.chatRef
+        box.scrollTop = box.scrollHeight
+      }, time)
     },
     formPrevTab () {
       this.transitionState = 'left'
@@ -137,26 +144,13 @@ export default {
         submitedForm: true
       })
       this.$track.event('chat.customer.create-lead.bot-message') // Track
-    },
-    test () {}
+    }
   },
   async beforeMount () {
-    await this.fetchName(this.$route.params.chatId)
-    await this.fetchMessages(this.$route.params.chatId)
+    // this.$route.params.chatId
+    // this.$route.params.boardId
+    await this.fetchChatData()
+    await this.fetchChatMessages()
     this.loadingMessages = false
-    this.chatData.userId = this.$route.params.userId
-    this.chatData.id = this.$route.params.chatId
-    this.boardData = {
-      id: this.$route.params.boardId,
-      token: this.$route.params.boardToken
-    }
-    if (this.chatData.submitedForm) {
-      this.formTab = 3
-    }
-
-    this.$socket.emit('joinChat', {
-      userId: this.chatData.userId,
-      chatId: this.chatData.id
-    })
   }
 }

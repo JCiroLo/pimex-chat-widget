@@ -3,14 +3,23 @@ import config from '../../config.json'
 
 const chatURL = config.chatsApi.url
 
+const fetchChat = async chatId => {
+  const { data } = await axios.get(`${chatURL}/chats/${chatId}`)
+  return data
+}
+
+const fetchMessages = async chatId => {
+  const { data } = await axios.get(`${chatURL}/messages/${chatId}`)
+  return data
+}
+
 const updateChat = async (boardData, chatId, chatData) => {
   try {
     const { data } = await axios.put(`${chatURL}/chats/${chatId}`, chatData, {
       auth: {
         username: boardData.id,
         password: boardData.token
-      },
-      headers: { 'Access-Control-Allow-Origin': '*' }
+      }
     })
     return data
   } catch (e) {
@@ -23,25 +32,14 @@ const createLead = async (boardData, leadData) => {
     auth: {
       username: boardData.id,
       password: boardData.token
-    },
-    headers: { 'Access-Control-Allow-Origin': '*' }
+    }
   })
   return data
 }
 
-const addMessage = async (boardData, MessageData) => {
-  try {
-    const { data } = await axios.post(`${chatURL}/messages`, MessageData, {
-      auth: {
-        username: boardData.id,
-        password: boardData.token
-      },
-      headers: { 'Access-Control-Allow-Origin': '*' }
-    })
-    return data
-  } catch (e) {
-    console.log(e)
-  }
+const sendMessage = async messageData => {
+  const { data } = await axios.post(`${chatURL}/messages`, messageData)
+  return data
 }
 
-export { addMessage, updateChat, createLead }
+export { updateChat, createLead, fetchChat, fetchMessages, sendMessage }
